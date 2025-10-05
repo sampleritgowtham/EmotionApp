@@ -1,8 +1,8 @@
-streamlit==1.29.0
-pandas==2.2.1
-numpy==1.27.0
+streamlit==1.30.0
+pandas==2.2.2
+numpy==1.26.5
 matplotlib==3.8.0
-pyarrow==12.0.1  # sometimes needed for CSV reading
+
 
 
 
