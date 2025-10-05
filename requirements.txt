@@ -1,6 +1,7 @@
 streamlit==1.30.0
-torch==2.2.0
+torch==2.8.0
 torchvision==0.18.1
 pandas==2.1.0
 numpy==1.27.0
 matplotlib==3.8.0
+
