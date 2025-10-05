@@ -1,14 +1,10 @@
-# app_fast.py
+# app_ultrafast.py
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
-st.title("Emotion Recognition Demo (Fast Mode)")
+st.title("Emotion Recognition Demo (Ultra-Fast)")
 
-# -----------------------------
-# 1️⃣ Upload Dataset
-# -----------------------------
 uploaded_file = st.file_uploader("Upload a physiological CSV file", type=["csv"])
 
 if uploaded_file:
@@ -17,37 +13,20 @@ if uploaded_file:
     st.dataframe(df.head())
 
     features = ['ecg','bvp','gsr','rsp','skt','emg_zygo','emg_coru','emg_trap']
-    
-    # Aggressive subsample for speed
-    df_demo = df.head(500)
-    
-    # -----------------------------
-    # 2️⃣ Generate dummy predictions
-    # -----------------------------
+    df_demo = df.head(200)  # tiny subset
+
+    # Dummy predictions
     emotions = ['Happy','Sad','Surprise','Angry','Excited','Bored','Fear','Neutral']
     np.random.seed(42)
-    preds = np.random.choice(emotions, size=3)  # fewer sequences
-    
-    st.subheader("Predicted Emotions with Signal Plots and Reasoning")
-    
-    # Precompute stats for reasoning
-    ecg_mean, gsr_mean, rsp_std, emg_mean = df_demo['ecg'].mean(), df_demo['gsr'].mean(), df_demo['rsp'].std(), df_demo[['emg_zygo','emg_coru','emg_trap']].mean().mean()
-    
+    preds = np.random.choice(emotions, size=2)
+
+    st.subheader("Predicted Emotions and Signal Plots")
+
     for i, pred in enumerate(preds):
         st.markdown(f"### Sequence {i+1}: {pred}")
         
-        # Plot a small window
-        fig, axs = plt.subplots(len(features), 1, figsize=(8, 2*len(features)))
-        for j, f in enumerate(features):
-            axs[j].plot(df_demo[f].iloc[i*10:i*10+30])
-            axs[j].set_title(f)
-        st.pyplot(fig)
+        # Use Streamlit's fast line chart for each feature
+        for f in features[:4]:  # only 4 features to speed up
+            st.line_chart(df_demo[f].iloc[i*10:i*10+20])
         
-        # Fast reasoning
-        reasoning = []
-        reasoning.append(f"**Heart rate (ECG/BVP):** {'High' if df_demo['ecg'].iloc[i*10:i*10+30].mean() > ecg_mean else 'Normal'} → {'aroused/excited' if pred in ['Happy','Excited'] else 'calm'}")
-        reasoning.append(f"**GSR:** {'Spike detected' if df_demo['gsr'].iloc[i*10:i*10+30].max() > gsr_mean else 'Stable'} → {'stress/surprise' if pred=='Surprise' else 'neutral'}")
-        reasoning.append(f"**RSP:** {'Irregular' if df_demo['rsp'].iloc[i*10:i*10+30].std() > rsp_std else 'Normal'} → {'fear/anxious' if pred=='Fear' else 'calm'}")
-        reasoning.append(f"**Muscle EMG:** {'Tensed' if df_demo[['emg_zygo','emg_coru','emg_trap']].iloc[i*10:i*10+30].mean().mean() > 0.5 else 'Relaxed'} → {'angry/frustrated' if pred=='Angry' else 'neutral'}")
-        
-        st.markdown("\n".join(reasoning))
+        st.markdown(f"**Reasoning (simplified):** Detected signals indicate likely **{pred}** state.")
