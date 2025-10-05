@@ -1,7 +1,8 @@
 streamlit==1.30.0
-pandas==2.2.2
-numpy==1.26.5
-matplotlib==3.8.0
+pandas==2.2.1
+numpy==1.25.0
+matplotlib==3.7.2
+
 
 
 
